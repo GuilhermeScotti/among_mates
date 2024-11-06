@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useRoutes } from "react-router-dom";
 import "./App.css";
 import ReadMates from "./pages/ReadMates";
-import EditMate from "./pages/EditMate";
 import CreateMate from "./pages/CreateMate";
 import { Mate, MateClass, MateColor } from "./types";
 import { supabaseClient } from "./supabaseClient";
@@ -37,7 +36,7 @@ const App = () => {
     },
     {
       path: "/edit/:id",
-      element: <EditMate />,
+      element: <CreateMate />,
     },
     {
       path: "/new",

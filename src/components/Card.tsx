@@ -1,38 +1,32 @@
-import React from "react";
-import { useState } from "react";
 import "./Card.css";
-// import more from "./more.png";
-// import { supabase } from "../client";
 import { Link } from "react-router-dom";
 import { Mate } from "../types";
 
 interface CardProps {
-  data: Mate;
+  mate: Mate;
 }
 
 const Card = (props: CardProps) => {
-  const { data } = props;
-  // const [count, setCount] = useState(props.betCount);
-  // const updateCount = async (event) => {
-  //   event.preventDefault();
-
-  //   await supabase
-  //     .from("Posts")
-  //     .update({ betCount: count + 1 })
-  //     .eq("id", props.id);
-
-  //   // setCount((count) => count + 1);
-  // };
+  const { mate } = props;
+  const style = {
+    backgroundColor: mate.color,
+  };
 
   return (
     <div className="Card">
-      <Link to={"edit/" + data.id}>+</Link>
-      <h2 className="title">{data.name}</h2>
-      <h3 className="author">{"by " + data.class}</h3>
-      <p className="description">{data.color}</p>
-      {/* <button className="betButton" onClick={updateCount}>
-        👍 Bet Count: {count}
-      </button> */}
+      <h4>{"Name: " + mate.name}</h4>
+      <h4>{"Class: " + mate.class}</h4>
+      <h4>{"Color: " + mate.color}</h4>
+
+      <img
+        src="/public/among-us.svg" // Make sure the SVG has an `id` attribute for referencing
+        alt="Icon"
+        width={100}
+        style={style} // Use CSS filter if needed for simple color adjustments
+      />
+      <br />
+
+      <Link to={"edit/" + mate.id}>edit..</Link>
     </div>
   );
 };

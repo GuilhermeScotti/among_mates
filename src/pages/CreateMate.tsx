@@ -1,11 +1,41 @@
 // MyComponent.js
-import React, { useState } from "react";
-import { Mate } from "../types";
+import React, { useEffect, useState } from "react";
+import { INITIAL_MATE, Mate, MateClass, MateColor } from "../types";
+import { supabaseClient } from "../supabaseClient";
+import { useParams } from "react-router-dom";
 
 const CreateMate = () => {
-  const [mate, setMate] = useState<Mate>();
+  const { id } = useParams();
+  const isEditing = !!id;
+  const [internalMate, setMate] = useState<Mate>(INITIAL_MATE);
 
-  const handleChange = (event) => {
+  useEffect(() => {
+    const fetchMate = async () => {
+      const supabase = supabaseClient();
+      const { data, error } = await supabase
+        .from("Mates")
+        .select()
+        .eq("id", id)
+        .single();
+
+      if (!error && data) {
+        const mateWithEnums: Mate = {
+          ...data,
+          color: data.color as MateColor,
+          class: data.class as MateClass,
+        };
+        setMate(mateWithEnums);
+      }
+    };
+
+    if (isEditing) {
+      fetchMate();
+    }
+  }, []);
+
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = event.target;
     setMate((prev) => {
       return {
@@ -15,45 +45,105 @@ const CreateMate = () => {
     });
   };
 
-  const createPost = async (event) => {
+  const handleColorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = event.target;
+    setMate((prev) => {
+      return {
+        ...prev,
+        [name]: value,
+      };
+    });
+  };
+
+  const createPost = async (event: React.MouseEvent<HTMLInputElement>) => {
     event.preventDefault();
+    const supabase = supabaseClient();
 
-    await supabase
-      .from("Posts")
-      .insert({
-        title: post.title,
-        author: post.author,
-        description: post.description,
-      })
-      .select();
+    if (isEditing) {
+      await supabase
+        .from("Mates")
+        .update({
+          name: internalMate.name,
+          color: internalMate.color,
+          class: internalMate.class,
+        })
+        .eq("id", internalMate.id);
+    } else {
+      await supabase
+        .from("Mates")
+        .insert({
+          name: internalMate.name,
+          color: internalMate.color,
+          class: internalMate.class,
+        })
+        .select();
+    }
 
-    window.location = "/";
+    window.location.href = "/";
+  };
+
+  const deletePost = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const supabase = supabaseClient();
+
+    await supabase.from("Mates").delete().eq("id", internalMate.id);
+
+    window.location.href = "/";
   };
 
   return (
     <div>
       <form>
-        <label for="title">Title</label> <br />
-        <input type="text" id="title" name="title" onChange={handleChange} />
-        <br />
-        <br />
-        <label for="author">Author</label>
-        <br />
-        <input type="text" id="author" name="author" onChange={handleChange} />
-        <br />
-        <br />
-        <label for="description">Description</label>
-        <br />
-        <textarea
-          rows="5"
-          cols="50"
-          id="description"
-          name="description"
+        <label htmlFor="title">Name</label> <br />
+        <input
+          type="text"
+          id="name"
+          name="name"
+          value={internalMate.name}
           onChange={handleChange}
-        ></textarea>
+        />
+        <br />
+        <br />
+        <label htmlFor="color">Select Color</label>
+        <br />
+        <select
+          id="color"
+          name="color"
+          value={internalMate.color}
+          onChange={handleColorChange}
+        >
+          {Object.values(MateColor).map((color) => (
+            <option key={color} value={color}>
+              {color.charAt(0).toUpperCase() + color.slice(1)}{" "}
+            </option>
+          ))}
+        </select>
+        <br />
+        <br />
+        <label htmlFor="class">Select Class</label>
+        <br />
+        <select
+          id="class"
+          name="class"
+          value={internalMate.class}
+          onChange={handleColorChange}
+        >
+          {Object.values(MateClass).map((className) => (
+            <option key={className} value={className}>
+              {className.charAt(0).toUpperCase() + className.slice(1)}{" "}
+            </option>
+          ))}
+        </select>
+        <br />
         <br />
         <input type="submit" value="Submit" onClick={createPost} />
       </form>
+
+      {isEditing && (
+        <button className="deleteButton" onClick={deletePost}>
+          Delete
+        </button>
+      )}
     </div>
   );
 };

@@ -21,3 +21,11 @@ export enum MateClass {
   PIRATE = "pirate",
   CHEF = "chef",
 }
+
+export const INITIAL_MATE: Mate = {
+  id: 0,
+  created_at: new Date().toISOString(),
+  name: "",
+  color: MateColor.RED,
+  class: MateClass.COWBOY,
+};
