@@ -1,6 +1,12 @@
 // MyComponent.js
 import React, { useEffect, useState } from "react";
-import { INITIAL_MATE, Mate, MateClass, MateColor } from "../types";
+import {
+  CLASS_ALLOWED_COLORS,
+  INITIAL_MATE,
+  Mate,
+  MateClass,
+  MateColor,
+} from "../types";
 import { supabaseClient } from "../supabaseClient";
 import { useParams } from "react-router-dom";
 
@@ -47,12 +53,18 @@ const CreateMate = () => {
 
   const handleColorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = event.target;
-    setMate((prev) => {
-      return {
-        ...prev,
-        [name]: value,
-      };
-    });
+    const updatedColor =
+      name === "class"
+        ? CLASS_ALLOWED_COLORS[value as MateClass][0]
+        : internalMate.color;
+
+    const updatedMate = {
+      ...internalMate,
+      color: updatedColor,
+      [name]: value,
+    };
+
+    setMate(updatedMate);
   };
 
   const createPost = async (event: React.MouseEvent<HTMLInputElement>) => {
@@ -104,7 +116,7 @@ const CreateMate = () => {
         />
         <br />
         <br />
-        <label htmlFor="color">Select Color</label>
+        <label htmlFor="color">Select Class Color</label>
         <br />
         <select
           id="color"
@@ -112,11 +124,13 @@ const CreateMate = () => {
           value={internalMate.color}
           onChange={handleColorChange}
         >
-          {Object.values(MateColor).map((color) => (
-            <option key={color} value={color}>
-              {color.charAt(0).toUpperCase() + color.slice(1)}{" "}
-            </option>
-          ))}
+          {Object.values(CLASS_ALLOWED_COLORS[internalMate.class]).map(
+            (color) => (
+              <option key={color} value={color}>
+                {color.charAt(0).toUpperCase() + color.slice(1)}{" "}
+              </option>
+            )
+          )}
         </select>
         <br />
         <br />

@@ -29,3 +29,19 @@ export const INITIAL_MATE: Mate = {
   color: MateColor.RED,
   class: MateClass.COWBOY,
 };
+
+export const CLASS_ALLOWED_COLORS: Record<MateClass, MateColor[]> = {
+  [MateClass.COWBOY]: [MateColor.RED, MateColor.ORANGE],
+  [MateClass.ROBOT]: [MateColor.BLUE, MateColor.PURPLE],
+  [MateClass.PIRATE]: [MateColor.GREEN, MateColor.YELLOW],
+  [MateClass.CHEF]: [MateColor.YELLOW, MateColor.GREEN],
+};
+
+export interface ColorPercentages {
+  [MateColor.RED]: number;
+  [MateColor.BLUE]: number;
+  [MateColor.GREEN]: number;
+  [MateColor.YELLOW]: number;
+  [MateColor.PURPLE]: number;
+  [MateColor.ORANGE]: number;
+}
